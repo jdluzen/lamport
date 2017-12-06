@@ -5,16 +5,7 @@ namespace DZen.Security.Cryptography
 {
     public class Lamport16 : Lamport
     {
-        public static (byte[] PrivateKey, (byte[] A, byte[] B)[] PrivateKeyPairs) GeneratePrivateKey16(IHashChain hashChain = null)
-        {
-            if (hashChain == null)
-                hashChain = new Sha256HashChain();
-            byte[] privateKey = new byte[32];
-            RandomNumberGenerator.Create().GetBytes(privateKey);
-            return (privateKey, ExpandPrivateKey16(privateKey));
-        }
-
-        public static (byte[] A, byte[] B)[] ExpandPrivateKey16(byte[] privateKey, IHashChain hashChain = null)
+        public override (byte[] A, byte[] B)[] ExpandPrivateKey(byte[] privateKey, IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
@@ -30,11 +21,11 @@ namespace DZen.Security.Cryptography
             return privateKeyPairs;
         }
 
-        public static (byte[] Pa, byte[] Pb)[] GetPublicKey16(byte[] privateKey, IHashChain hashChain = null)
+        public override (byte[] Pa, byte[] Pb)[] GetPublicKey(byte[] privateKey, IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
-            (byte[] A, byte[] B)[] privateKeyExpanded = ExpandPrivateKey16(privateKey);
+            (byte[] A, byte[] B)[] privateKeyExpanded = ExpandPrivateKey(privateKey);
             (byte[] pa, byte[] pb)[] publicKey = new(byte[], byte[])[privateKeyExpanded.Length];
             for (byte i = 0; i < publicKey.Length; i++)
             {
@@ -49,11 +40,11 @@ namespace DZen.Security.Cryptography
             return publicKey;
         }
 
-        public static (byte[] a, byte[] b)[] Sign16(byte[] data, byte[] privateKey, IHashChain hashChain = null)
+        public override (byte[] a, byte[] b)[] Sign(byte[] data, byte[] privateKey, IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
-            var privateKeyChunks = ExpandPrivateKey16(privateKey);
+            var privateKeyChunks = ExpandPrivateKey(privateKey);
             SHA256 sha256 = SHA256.Create();
             byte[] hash = sha256.ComputeHash(data);
             (byte[] a, byte[] b)[] signature = new(byte[] ah, byte[] bh)[privateKey.Length / 2];
@@ -75,7 +66,7 @@ namespace DZen.Security.Cryptography
             return signature;
         }
 
-        public static bool Verify16(byte[] data, (byte[] Pa, byte[] Pb)[] publicKey, (byte[] a, byte[] b)[] signature)
+        public override bool Verify(byte[] data, (byte[] Pa, byte[] Pb)[] publicKey, (byte[] a, byte[] b)[] signature)
         {
             SHA256 sha256 = SHA256.Create();
             byte[] hash = sha256.ComputeHash(data);

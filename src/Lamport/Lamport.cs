@@ -5,7 +5,7 @@ namespace DZen.Security.Cryptography
 {
     public class Lamport
     {
-        public static (byte[] PrivateKey, (byte[] A, byte[] B)[] PrivateKeyPairs) GeneratePrivateKey(IHashChain hashChain = null)
+        public virtual (byte[] PrivateKey, (byte[] A, byte[] B)[] PrivateKeyPairs) GeneratePrivateKey(IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
@@ -14,7 +14,7 @@ namespace DZen.Security.Cryptography
             return (privateKey, ExpandPrivateKey(privateKey));
         }
 
-        public static (byte[] A, byte[] B)[] ExpandPrivateKey(byte[] privateKey, IHashChain hashChain = null)
+        public virtual (byte[] A, byte[] B)[] ExpandPrivateKey(byte[] privateKey, IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
@@ -30,7 +30,7 @@ namespace DZen.Security.Cryptography
             return privateKeyPairs;
         }
 
-        public static (byte[] Pa, byte[] Pb)[] GetPublicKey(byte[] privateKey, IHashChain hashChain = null)
+        public virtual (byte[] Pa, byte[] Pb)[] GetPublicKey(byte[] privateKey, IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
@@ -49,7 +49,7 @@ namespace DZen.Security.Cryptography
             return publicKey;
         }
 
-        public static (byte[] a, byte[] b)[] Sign(byte[] data, byte[] privateKey, IHashChain hashChain = null)
+        public virtual (byte[] a, byte[] b)[] Sign(byte[] data, byte[] privateKey, IHashChain hashChain = null)
         {
             if (hashChain == null)
                 hashChain = new Sha256HashChain();
@@ -74,7 +74,7 @@ namespace DZen.Security.Cryptography
             return signature;
         }
 
-        public static bool Verify(byte[] data, (byte[] Pa, byte[] Pb)[] publicKey, (byte[] a, byte[] b)[] signature)
+        public virtual bool Verify(byte[] data, (byte[] Pa, byte[] Pb)[] publicKey, (byte[] a, byte[] b)[] signature)
         {
             SHA256 sha256 = SHA256.Create();
             byte[] hash = sha256.ComputeHash(data);
