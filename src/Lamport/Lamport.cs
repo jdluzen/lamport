@@ -1,3 +1,4 @@
+using System;
 using System.Security.Cryptography;
 
 namespace DZen.Security.Cryptography
@@ -39,7 +40,7 @@ namespace DZen.Security.Cryptography
             {
                 publicKey[i].pa = privateKeyExpanded[i].A;
                 publicKey[i].pb = privateKeyExpanded[i].B;
-                for (short j = 0; j < 258; j++)
+                for (short j = 0; j < byte.MaxValue + 3; j++)
                 {
                     publicKey[i].pa = hashChain.GetNextHash(publicKey[i].pa);
                     publicKey[i].pb = hashChain.GetNextHash(publicKey[i].pb);
@@ -64,7 +65,7 @@ namespace DZen.Security.Cryptography
                     a = sha256.ComputeHash(a);
                 }
                 byte[] b = privateKeyChunks[i].B;
-                for (short j = 0; j < 256 - hash[i]; j++)
+                for (short j = 0; j < (byte.MaxValue + 1) - hash[i]; j++)
                 {
                     b = sha256.ComputeHash(b);
                 }
@@ -81,28 +82,28 @@ namespace DZen.Security.Cryptography
             {
                 short i_a = 0, i_b = 0;
                 byte[] a = signature[i].a;
-                for (; i_a < 256; i_a++)
+                for (; i_a < byte.MaxValue + 1; i_a++)
                 {
                     a = sha256.ComputeHash(a);
                     if (Memcmp(a, publicKey[i].Pa))
                         break;
                 }
-                if (i_a == 256)
+                if (i_a == byte.MaxValue + 1)
                     return false;
                 byte[] b = signature[i].b;
-                for (; i_b < 256; i_b++)
+                for (; i_b < byte.MaxValue + 1; i_b++)
                 {
                     b = sha256.ComputeHash(b);
                     if (Memcmp(b, publicKey[i].Pb))
                         break;
                 }
-                if (256 - i_a != i_b - 1 || 256 - i_a != hash[i])
+                if ((byte.MaxValue + 1) - i_a != i_b - 1 || (byte.MaxValue + 1) - i_a != hash[i])
                     return false;
             }
             return true;
         }
 
-        private static bool Memcmp(byte[] a, byte[] b)
+        protected static bool Memcmp(byte[] a, byte[] b)
         {
             if (a.Length != b.Length)
                 return false;
